@@ -1,0 +1,101 @@
+product_id,category,price,cost
+1,Toys,20.54,11.01
+2,Home & Garden,5.0,3.13
+3,Clothing,23.81,14.22
+4,Clothing,68.77,30.56
+5,Clothing,50.91,27.1
+6,Electronics,46.64,25.45
+7,Sports,26.47,17.74
+8,Electronics,11.9,8.27
+9,Toys,50.01,20.55
+10,Home & Garden,16.99,9.97
+11,Electronics,190.05,98.64
+12,Electronics,52.27,35.34
+13,Electronics,20.81,10.3
+14,Clothing,20.31,8.53
+15,Toys,30.74,16.21
+16,Home & Garden,27.34,18.1
+17,Electronics,80.92,42.52
+18,Electronics,38.44,18.07
+19,Electronics,18.44,10.66
+20,Beauty,150.26,65.52
+21,Electronics,34.45,17.41
+22,Electronics,61.26,26.35
+23,Books,20.36,10.44
+24,Toys,44.28,29.25
+25,Toys,42.47,25.79
+26,Sports,7.3,4.67
+27,Home & Garden,166.04,70.96
+28,Sports,92.99,43.88
+29,Food,24.1,11.98
+30,Electronics,13.71,8.36
+31,Electronics,43.73,28.2
+32,Books,35.49,16.79
+33,Electronics,44.02,24.55
+34,Toys,38.6,24.41
+35,Clothing,49.65,25.57
+36,Clothing,105.41,72.51
+37,Toys,52.17,31.41
+38,Clothing,14.3,8.0
+39,Home & Garden,98.5,64.58
+40,Electronics,123.04,49.78
+41,Electronics,412.26,262.72
+42,Electronics,13.48,8.91
+43,Clothing,40.22,25.7
+44,Home & Garden,6.26,2.94
+45,Electronics,51.55,29.5
+46,Toys,21.36,11.33
+47,Electronics,154.28,107.02
+48,Electronics,17.82,12.29
+49,Electronics,8.57,4.85
+50,Clothing,22.71,10.34
+51,Food,6.82,2.96
+52,Home & Garden,60.39,40.7
+53,Home & Garden,6.35,3.42
+54,Electronics,33.88,14.43
+55,Food,6.28,3.67
+56,Clothing,25.63,11.56
+57,Sports,123.31,81.37
+58,Clothing,44.19,18.53
+59,Toys,16.6,7.88
+60,Electronics,32.3,13.49
+61,Home & Garden,33.6,16.7
+62,Toys,48.33,28.56
+63,Home & Garden,11.1,4.64
+64,Toys,53.2,32.84
+65,Books,5.0,3.0
+66,Beauty,20.01,9.8
+67,Books,22.41,10.54
+68,Electronics,54.96,23.15
+69,Beauty,33.72,21.53
+70,Clothing,10.76,4.95
+71,Books,15.06,7.2
+72,Toys,38.82,26.43
+73,Sports,31.09,18.15
+74,Beauty,20.84,12.82
+75,Clothing,22.54,13.72
+76,Electronics,57.8,23.41
+77,Electronics,21.89,11.1
+78,Toys,30.86,14.96
+79,Electronics,187.91,76.48
+80,Beauty,10.6,6.22
+81,Clothing,7.53,3.46
+82,Electronics,61.98,35.31
+83,Electronics,19.24,8.45
+84,Books,25.67,16.58
+85,Electronics,17.73,7.37
+86,Clothing,26.9,17.07
+87,Clothing,118.97,71.63
+88,Food,62.91,29.77
+89,Beauty,66.01,38.41
+90,Electronics,10.67,5.52
+91,Electronics,13.18,7.47
+92,Home & Garden,5.0,2.39
+93,Books,17.33,10.94
+94,Books,71.19,48.59
+95,Clothing,50.08,30.55
+96,Electronics,27.74,15.47
+97,Toys,32.53,21.13
+98,Sports,19.08,11.33
+99,Sports,39.01,22.63
+100,Food,61.11,41.73
