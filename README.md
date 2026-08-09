@@ -1,4 +1,4 @@
-# 📊 Sales Analytics Dashboard V2
+# Sales Analytics Dashboard V2
 
 Pipeline automatizado de análisis de ventas desarrollado con **Python, SQL Server y Power BI**, diseñado para simular el flujo de trabajo de un proyecto real de **Data Analytics** y **Business Intelligence**.
 
