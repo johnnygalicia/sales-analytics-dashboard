@@ -8,249 +8,427 @@ Características clave:
 - Relaciones FK consistentes
 - Complejidad temporal y de segmentación
 - Métricas de negocio calculables
+
+Modularizado para poder importarse desde un proyecto principal:
+    from generate_sales_data import generate_customers, generate_products, \
+        generate_orders, generate_order_items, main
 """
-# Librerías necesarias
-import pandas as pd
-import numpy as np
-from datetime import datetime, timedelta
-import random
+
 import os
+import random
+from datetime import datetime, timedelta
 
-# Seed para reproducibilidad
-np.random.seed(42)
-random.seed(42)
+import numpy as np
+import pandas as pd
 
-# Crear carpeta de salida
-os.makedirs('datasets', exist_ok=True)
-
-print("Generando datasets realistas...")
 
 # ============================================================================
-# CUSTOMERS.CSV
+# CONFIGURACIÓN POR DEFECTO
 # ============================================================================
-print("\n[1/4] Generando customers.csv...")
 
-NUM_CUSTOMERS = 5000
+DEFAULT_SEED = 42
+DEFAULT_NUM_CUSTOMERS = 10000
+DEFAULT_NUM_PRODUCTS = 500
+DEFAULT_NUM_ORDERS = 200000
+DEFAULT_START_DATE = datetime(2020, 1, 1)
+DEFAULT_END_DATE = datetime(2024, 12, 31)
+DEFAULT_OUTPUT_DIR = "datasets"
 
-# Distribución realista de fechas de signup (crecimiento exponencial)
-start_date = datetime(2020, 1, 1)
-end_date = datetime(2024, 12, 31)
-days_range = (end_date - start_date).days
 
-# Pesos exponenciales: más signups recientes
-weights = np.exp(np.linspace(0, 3, days_range))
-weights = weights / weights.sum()
+def set_seed(seed=DEFAULT_SEED):
+    """Fija la semilla de numpy y random para reproducibilidad."""
+    np.random.seed(seed)
+    random.seed(seed)
 
-signup_days = np.random.choice(days_range, size=NUM_CUSTOMERS, p=weights)
-signup_dates = [start_date + timedelta(days=int(d)) for d in signup_days]
-
-# Países con distribución realista (concentración en top 3)
-countries = ['USA', 'UK', 'Canada', 'Germany', 'France', 'Spain', 'Australia', 'Mexico', 'Brazil', 'Japan']
-country_weights = [0.35, 0.20, 0.15, 0.08, 0.07, 0.05, 0.04, 0.03, 0.02, 0.01]
-customer_countries = random.choices(countries, weights=country_weights, k=NUM_CUSTOMERS)
-
-# Segmentación realista: pirámide (muchos low, pocos high)
-segment_choices = ['low', 'medium', 'high']
-segment_weights = [0.60, 0.30, 0.10]
-customer_segments = random.choices(segment_choices, weights=segment_weights, k=NUM_CUSTOMERS)
-
-# Canales de adquisición
-channels = ['organic', 'ads', 'referral', 'email', 'social']
-channel_weights = [0.35, 0.30, 0.20, 0.10, 0.05]
-acquisition_channels = random.choices(channels, weights=channel_weights, k=NUM_CUSTOMERS)
-
-# Churn realista: ~15% inactivos, más probable en low segment
-is_active = []
-for seg in customer_segments:
-    if seg == 'low':
-        is_active.append(random.random() > 0.25)  # 25% churn
-    elif seg == 'medium':
-        is_active.append(random.random() > 0.12)  # 12% churn
-    else:  # high
-        is_active.append(random.random() > 0.05)  # 5% churn
-
-customers_df = pd.DataFrame({
-    'customer_id': range(1, NUM_CUSTOMERS + 1),
-    'signup_date': signup_dates,
-    'country': customer_countries,
-    'customer_segment': customer_segments,
-    'acquisition_channel': acquisition_channels,
-    'is_active': is_active
-})
-
-customers_df.to_csv('datasets/customers.csv', index=False)
-print(f"✓ {len(customers_df):,} customers generados")
 
 # ============================================================================
-# PRODUCTS.CSV
+# MODELO DE CRECIMIENTO DINÁMICO (para signups y, si se quiere, otras series)
 # ============================================================================
-print("\n[2/4] Generando products.csv...")
 
-NUM_PRODUCTS = 100
+def _logistic_trend(t, days_range, steepness=6.0, midpoint_frac=0.55):
+    """
+    Curva-S (crecimiento logístico) en vez de exponencial puro.
+    Un negocio real no crece exponencialmente para siempre: arranca lento,
+    acelera, y luego se satura. steepness controla qué tan brusca es la
+    aceleración; midpoint_frac controla en qué punto del rango temporal
+    ocurre el punto de inflexión.
+    """
+    midpoint = days_range * midpoint_frac
+    k = steepness / days_range
+    return 1.0 / (1.0 + np.exp(-k * (t - midpoint)))
 
-# Categorías con distribución realista
-categories = ['Electronics', 'Clothing', 'Home & Garden', 'Sports', 'Books', 'Toys', 'Beauty', 'Food']
-category_weights = [0.25, 0.20, 0.15, 0.12, 0.10, 0.08, 0.06, 0.04]
-product_categories = random.choices(categories, weights=category_weights, k=NUM_PRODUCTS)
 
-# Precios con distribución log-normal (realista para retail)
-prices = np.random.lognormal(mean=3.5, sigma=0.8, size=NUM_PRODUCTS)
-prices = np.clip(prices, 5, 500)  # Entre $5 y $500
+def _seasonal_wave(t, period, amplitude, phase=0):
+    """Componente sinusoidal simple (estacionalidad anual, semanal, etc.)."""
+    return amplitude * np.sin(2 * np.pi * (t + phase) / period)
 
-# Costos: 40-70% del precio (margen variable realista)
-margin_pcts = np.random.uniform(0.30, 0.60, NUM_PRODUCTS)
-costs = prices * (1 - margin_pcts)
 
-products_df = pd.DataFrame({
-    'product_id': range(1, NUM_PRODUCTS + 1),
-    'category': product_categories,
-    'price': np.round(prices, 2),
-    'cost': np.round(costs, 2)
-})
+def _campaign_spikes(days_range, num_campaigns=10, amplitude=1.4, decay_days=12):
+    """
+    Simula ráfagas de campañas de marketing: en días aleatorios, un pico
+    de señal que decae exponencialmente en los días siguientes. Rompe
+    cualquier patrón suave y predecible.
+    """
+    spikes = np.zeros(days_range)
+    campaign_days = np.random.choice(days_range, size=min(num_campaigns, days_range), replace=False)
+    for day in campaign_days:
+        for offset in range(decay_days):
+            idx = day + offset
+            if idx >= days_range:
+                break
+            spikes[idx] += amplitude * np.exp(-offset / (decay_days / 3))
+    return spikes
 
-products_df.to_csv('datasets/products.csv', index=False)
-print(f"✓ {len(products_df):,} productos generados")
 
-# ============================================================================
-# ORDERS.CSV
-# ============================================================================
-print("\n[3/4] Generando orders.csv...")
+def generate_growth_weights(days_range,
+                             steepness=6.0,
+                             midpoint_frac=0.55,
+                             yearly_amplitude=0.25,
+                             weekly_amplitude=0.10,
+                             num_campaigns=10,
+                             noise_sigma=0.15):
+    """
+    Combina varias señales en un solo vector de pesos por día:
+    - Tendencia logística (crecimiento realista con saturación)
+    - Estacionalidad anual (temporadas altas/bajas, ej. fin de año)
+    - Estacionalidad semanal (días con más/menos actividad)
+    - Picos de campañas de marketing en fechas aleatorias
+    - Ruido multiplicativo log-normal (evita que se vea "de manual")
 
-NUM_ORDERS = 50000
+    Es intencionalmente simple (todo son funciones cerradas, sin estado),
+    pero al combinarse ya no genera una curva monótona y predecible.
+    """
+    t = np.arange(days_range)
 
-# Distribución de órdenes por cliente: power law (pocos compran mucho)
-# Clientes activos tienen más probabilidad de ordenar
-active_customers = customers_df[customers_df['is_active']]['customer_id'].tolist()
-inactive_customers = customers_df[~customers_df['is_active']]['customer_id'].tolist()
+    trend = _logistic_trend(t, days_range, steepness, midpoint_frac)
+    yearly = _seasonal_wave(t, period=365, amplitude=yearly_amplitude)
+    weekly = _seasonal_wave(t, period=7, amplitude=weekly_amplitude, phase=2)
+    spikes = _campaign_spikes(days_range, num_campaigns=num_campaigns)
+    noise = np.random.lognormal(mean=0.0, sigma=noise_sigma, size=days_range)
 
-# 90% de órdenes de clientes activos
-num_orders_active = int(NUM_ORDERS * 0.90)
-num_orders_inactive = NUM_ORDERS - num_orders_active
+    raw_weights = trend * (1 + yearly + weekly + spikes) * noise
+    raw_weights = np.clip(raw_weights, a_min=1e-6, a_max=None)  # evitar pesos negativos/cero
 
-# Distribución power law: algunos clientes ordenan mucho
-order_customers = []
+    return raw_weights / raw_weights.sum()
 
-# Activos: repetición con pesos exponenciales
-for _ in range(num_orders_active):
-    customer = random.choice(active_customers)
-    order_customers.append(customer)
-
-# Inactivos: solo 1-2 órdenes históricas
-for _ in range(num_orders_inactive):
-    customer = random.choice(inactive_customers)
-    order_customers.append(customer)
-
-random.shuffle(order_customers)
-
-# Fechas de órdenes: después del signup del cliente, distribución temporal realista
-order_dates = []
-for cust_id in order_customers:
-    signup = customers_df[customers_df['customer_id'] == cust_id]['signup_date'].iloc[0]
-    
-    # Orden entre signup y hoy, con mayor densidad reciente
-    days_since_signup = (end_date - signup).days
-    if days_since_signup > 0:
-        # Distribución exponencial: más órdenes recientes
-        days_offset = int(np.random.exponential(days_since_signup / 3))
-        days_offset = min(days_offset, days_since_signup)
-        order_date = signup + timedelta(days=days_offset)
-    else:
-        order_date = signup
-    
-    order_dates.append(order_date)
-
-# Montos: distribución realista con outliers
-# La mayoría de órdenes: $20-$200
-# Algunos outliers: hasta $5000
-base_amounts = np.random.lognormal(mean=4.0, sigma=0.7, size=NUM_ORDERS)
-base_amounts = np.clip(base_amounts, 10, 300)
-
-# Añadir outliers (2% de órdenes grandes)
-num_outliers = int(NUM_ORDERS * 0.02)
-outlier_indices = np.random.choice(NUM_ORDERS, size=num_outliers, replace=False)
-base_amounts[outlier_indices] = np.random.uniform(500, 5000, size=num_outliers)
-
-order_amounts = np.round(base_amounts, 2)
-
-# Payment methods
-payment_methods = ['credit_card', 'debit_card', 'paypal', 'bank_transfer', 'crypto']
-payment_weights = [0.50, 0.25, 0.15, 0.08, 0.02]
-order_payments = random.choices(payment_methods, weights=payment_weights, k=NUM_ORDERS)
-
-# Status: mayormente completed, algunos canceled/refunded
-status_choices = ['completed', 'canceled', 'refunded']
-status_weights = [0.88, 0.08, 0.04]
-order_statuses = random.choices(status_choices, weights=status_weights, k=NUM_ORDERS)
-
-orders_df = pd.DataFrame({
-    'order_id': range(1, NUM_ORDERS + 1),
-    'customer_id': order_customers,
-    'order_date': order_dates,
-    'order_amount': order_amounts,
-    'payment_method': order_payments,
-    'order_status': order_statuses
-})
-
-# Ordenar por fecha para realismo
-orders_df = orders_df.sort_values('order_date').reset_index(drop=True)
-orders_df['order_id'] = range(1, NUM_ORDERS + 1)
-
-orders_df.to_csv('datasets/orders.csv', index=False)
-print(f"✓ {len(orders_df):,} órdenes generadas")
 
 # ============================================================================
-# ORDER_ITEMS.CSV
+# 1. CUSTOMERS
 # ============================================================================
-print("\n[4/4] Generando order_items.csv...")
 
-order_items = []
+def generate_customers(num_customers=DEFAULT_NUM_CUSTOMERS,
+                        start_date=DEFAULT_START_DATE,
+                        end_date=DEFAULT_END_DATE):
+    """
+    Genera el DataFrame de clientes con:
+    - Fechas de signup con un modelo de crecimiento dinámico (curva-S +
+      estacionalidad + campañas + ruido), no un exponencial puro
+    - Países con distribución concentrada en top 3
+    - Segmentación en pirámide (low/medium/high)
+    - Canales de adquisición
+    - Churn dependiente del segmento
+    """
+    days_range = (end_date - start_date).days
 
-for order_id in orders_df['order_id']:
-    # Número de items por orden: distribución realista
-    # La mayoría: 1-3 items, algunos hasta 10
-    num_items = np.random.choice([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 
-                                  p=[0.40, 0.25, 0.15, 0.08, 0.05, 0.03, 0.02, 0.01, 0.005, 0.005])
-    
-    # Seleccionar productos únicos para esta orden
-    order_products = random.sample(range(1, NUM_PRODUCTS + 1), min(num_items, NUM_PRODUCTS))
-    
-    for product_id in order_products:
-        # Cantidad: mayormente 1, a veces más
-        quantity = np.random.choice([1, 2, 3, 4, 5], p=[0.70, 0.15, 0.08, 0.05, 0.02])
-        
-        order_items.append({
-            'order_id': order_id,
-            'product_id': product_id,
-            'quantity': quantity
-        })
+    weights = generate_growth_weights(days_range)
 
-order_items_df = pd.DataFrame(order_items)
-order_items_df.to_csv('datasets/order_items.csv', index=False)
-print(f"✓ {len(order_items_df):,} items de orden generados")
+    signup_days = np.random.choice(days_range, size=num_customers, p=weights)
+    signup_dates = [start_date + timedelta(days=int(d)) for d in signup_days]
+
+    # Países con distribución realista (concentración en top 3)
+    countries = ['USA', 'UK', 'Canada', 'Germany', 'France', 'Spain',
+                 'Australia', 'Mexico', 'Brazil', 'Japan']
+    country_weights = [0.35, 0.20, 0.15, 0.08, 0.07, 0.05, 0.04, 0.03, 0.02, 0.01]
+    customer_countries = random.choices(countries, weights=country_weights, k=num_customers)
+
+    # Segmentación realista: pirámide (muchos low, pocos high)
+    segment_choices = ['low', 'medium', 'high']
+    segment_weights = [0.60, 0.30, 0.10]
+    customer_segments = random.choices(segment_choices, weights=segment_weights, k=num_customers)
+
+    # Canales de adquisición
+    channels = ['organic', 'ads', 'referral', 'email', 'social']
+    channel_weights = [0.35, 0.30, 0.20, 0.10, 0.05]
+    acquisition_channels = random.choices(channels, weights=channel_weights, k=num_customers)
+
+    # Churn realista: más probable en low segment
+    churn_thresholds = {'low': 0.25, 'medium': 0.12, 'high': 0.05}
+    is_active = [random.random() > churn_thresholds[seg] for seg in customer_segments]
+
+    customers_df = pd.DataFrame({
+        'customer_id': range(1, num_customers + 1),
+        'signup_date': signup_dates,
+        'country': customer_countries,
+        'customer_segment': customer_segments,
+        'acquisition_channel': acquisition_channels,
+        'is_active': is_active
+    })
+
+    return customers_df
+
+
+# ============================================================================
+# 2. PRODUCTS
+# ============================================================================
+
+def generate_products(num_products=DEFAULT_NUM_PRODUCTS):
+    """
+    Genera el DataFrame de productos con:
+    - Categorías con distribución realista
+    - Precios log-normales (típico en retail)
+    - Costos como % variable del precio (margen 30-60%)
+    """
+    categories = ['Electronics', 'Clothing', 'Home & Garden', 'Sports',
+                  'Books', 'Toys', 'Beauty', 'Food']
+    category_weights = [0.25, 0.20, 0.15, 0.12, 0.10, 0.08, 0.06, 0.04]
+    product_categories = random.choices(categories, weights=category_weights, k=num_products)
+
+    # Precios con distribución log-normal
+    prices = np.random.lognormal(mean=3.5, sigma=0.8, size=num_products)
+    prices = np.clip(prices, 5, 500)
+
+    # Costos: margen variable realista
+    margin_pcts = np.random.uniform(0.30, 0.60, num_products)
+    costs = prices * (1 - margin_pcts)
+
+    products_df = pd.DataFrame({
+        'product_id': range(1, num_products + 1),
+        'category': product_categories,
+        'price': np.round(prices, 2),
+        'cost': np.round(costs, 2)
+    })
+
+    return products_df
+
+
+# ============================================================================
+# 3. ORDERS
+# ============================================================================
+
+def _assign_order_customers(customers_df, num_orders, active_ratio=0.90):
+    """Asigna clientes a órdenes: 90% activos, 10% inactivos (power law simple)."""
+    active_customers = customers_df.loc[customers_df['is_active'], 'customer_id'].tolist()
+    inactive_customers = customers_df.loc[~customers_df['is_active'], 'customer_id'].tolist()
+
+    num_orders_active = int(num_orders * active_ratio)
+    num_orders_inactive = num_orders - num_orders_active
+
+    order_customers = (
+        random.choices(active_customers, k=num_orders_active) +
+        random.choices(inactive_customers, k=num_orders_inactive)
+    )
+    random.shuffle(order_customers)
+    return order_customers
+
+
+def _assign_order_dates(order_customers, customers_df, end_date):
+    """Genera fechas de orden posteriores al signup, con densidad exponencial reciente."""
+    # Indexar signup_date por customer_id una sola vez (evita O(n^2))
+    signup_lookup = customers_df.set_index('customer_id')['signup_date']
+
+    order_dates = []
+    for cust_id in order_customers:
+        signup = signup_lookup.loc[cust_id]
+        days_since_signup = (end_date - signup).days
+
+        if days_since_signup > 0:
+            days_offset = int(np.random.exponential(days_since_signup / 3))
+            days_offset = min(days_offset, days_since_signup)
+            order_date = signup + timedelta(days=days_offset)
+        else:
+            order_date = signup
+
+        order_dates.append(order_date)
+
+    return order_dates
+
+
+def _generate_order_amounts(num_orders, outlier_pct=0.02):
+    """Montos con distribución log-normal + outliers intencionales (2% por defecto)."""
+    base_amounts = np.random.lognormal(mean=4.0, sigma=0.7, size=num_orders)
+    base_amounts = np.clip(base_amounts, 10, 300)
+
+    num_outliers = int(num_orders * outlier_pct)
+    outlier_indices = np.random.choice(num_orders, size=num_outliers, replace=False)
+    base_amounts[outlier_indices] = np.random.uniform(500, 5000, size=num_outliers)
+
+    return np.round(base_amounts, 2)
+
+
+def generate_orders(customers_df,
+                     num_orders=DEFAULT_NUM_ORDERS,
+                     end_date=DEFAULT_END_DATE):
+    """
+    Genera el DataFrame de órdenes con:
+    - Asignación de clientes ponderada por actividad
+    - Fechas posteriores al signup con densidad reciente
+    - Montos realistas con outliers
+    - Métodos de pago y status con distribución de negocio típica
+    """
+    order_customers = _assign_order_customers(customers_df, num_orders)
+    order_dates = _assign_order_dates(order_customers, customers_df, end_date)
+    order_amounts = _generate_order_amounts(num_orders)
+
+    payment_methods = ['credit_card', 'debit_card', 'paypal', 'bank_transfer', 'crypto']
+    payment_weights = [0.50, 0.25, 0.15, 0.08, 0.02]
+    order_payments = random.choices(payment_methods, weights=payment_weights, k=num_orders)
+
+    status_choices = ['completed', 'canceled', 'refunded']
+    status_weights = [0.88, 0.08, 0.04]
+    order_statuses = random.choices(status_choices, weights=status_weights, k=num_orders)
+
+    orders_df = pd.DataFrame({
+        'order_id': range(1, num_orders + 1),
+        'customer_id': order_customers,
+        'order_date': order_dates,
+        'order_amount': order_amounts,
+        'payment_method': order_payments,
+        'order_status': order_statuses
+    })
+
+    # Ordenar por fecha para realismo y reasignar IDs secuenciales
+    orders_df = orders_df.sort_values('order_date').reset_index(drop=True)
+    orders_df['order_id'] = range(1, num_orders + 1)
+
+    return orders_df
+
+
+# ============================================================================
+# 4. ORDER ITEMS
+# ============================================================================
+
+def generate_order_items(orders_df, num_products=DEFAULT_NUM_PRODUCTS):
+    """
+    Genera el DataFrame de items por orden:
+    - Número de items por orden (mayoría 1-3, cola larga hasta 10)
+    - Productos únicos por orden
+    - Cantidad por item (mayoría 1)
+    """
+    num_items_choices = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    num_items_weights = [0.40, 0.25, 0.15, 0.08, 0.05, 0.03, 0.02, 0.01, 0.005, 0.005]
+
+    quantity_choices = [1, 2, 3, 4, 5]
+    quantity_weights = [0.70, 0.15, 0.08, 0.05, 0.02]
+
+    order_items = []
+
+    for order_id in orders_df['order_id']:
+        num_items = np.random.choice(num_items_choices, p=num_items_weights)
+        order_products = random.sample(range(1, num_products + 1), min(num_items, num_products))
+
+        for product_id in order_products:
+            quantity = np.random.choice(quantity_choices, p=quantity_weights)
+            order_items.append({
+                'order_id': order_id,
+                'product_id': product_id,
+                'quantity': quantity
+            })
+
+    return pd.DataFrame(order_items)
+
+
+# ============================================================================
+# PERSISTENCIA
+# ============================================================================
+
+def save_datasets(datasets: dict, output_dir=DEFAULT_OUTPUT_DIR):
+    """
+    Guarda cada DataFrame del diccionario como CSV en output_dir.
+    datasets: {'customers': df, 'products': df, 'orders': df, 'order_items': df}
+    """
+    os.makedirs(output_dir, exist_ok=True)
+    for name, df in datasets.items():
+        path = os.path.join(output_dir, f"{name}.csv")
+        df.to_csv(path, index=False)
+        print(f"✓ {len(df):,} registros -> {path}")
+
 
 # ============================================================================
 # RESUMEN Y VALIDACIÓN
 # ============================================================================
-print("\n" + "="*70)
-print("DATASETS GENERADOS EXITOSAMENTE")
-print("="*70)
 
-print(f"\nESTADÍSTICAS:")
-print(f"  • customers.csv      : {len(customers_df):,} registros")
-print(f"  • products.csv       : {len(products_df):,} registros")
-print(f"  • orders.csv         : {len(orders_df):,} registros")
-print(f"  • order_items.csv    : {len(order_items_df):,} registros")
+def print_summary(customers_df, products_df, orders_df, order_items_df):
+    """Imprime estadísticas de validación y métricas de negocio clave."""
+    print("\n" + "=" * 70)
+    print("DATASETS GENERADOS EXITOSAMENTE")
+    print("=" * 70)
 
-print(f"\nVALIDACIONES:")
-print(f"  • Rango de fechas    : {customers_df['signup_date'].min()} - {orders_df['order_date'].max()}")
-print(f"  • Clientes activos   : {customers_df['is_active'].sum():,} ({customers_df['is_active'].mean()*100:.1f}%)")
-print(f"  • Órdenes completed  : {(orders_df['order_status']=='completed').sum():,} ({(orders_df['order_status']=='completed').mean()*100:.1f}%)")
-print(f"  • Promedio items/orden: {len(order_items_df)/len(orders_df):.2f}")
+    print("\nESTADÍSTICAS:")
+    print(f"  • customers      : {len(customers_df):,} registros")
+    print(f"  • products       : {len(products_df):,} registros")
+    print(f"  • orders         : {len(orders_df):,} registros")
+    print(f"  • order_items    : {len(order_items_df):,} registros")
 
-print(f"\nMÉTRICAS DE NEGOCIO DISPONIBLES:")
-print(f"  • Revenue total      : ${orders_df[orders_df['order_status']=='completed']['order_amount'].sum():,.2f}")
-print(f"  • AOV (completed)    : ${orders_df[orders_df['order_status']=='completed']['order_amount'].mean():,.2f}")
-print(f"  • Top país           : {customers_df['country'].value_counts().index[0]} ({customers_df['country'].value_counts().iloc[0]:,} customers)")
+    print("\nVALIDACIONES:")
+    print(f"  • Rango de fechas     : {customers_df['signup_date'].min()} - {orders_df['order_date'].max()}")
+    print(f"  • Clientes activos    : {customers_df['is_active'].sum():,} "
+          f"({customers_df['is_active'].mean() * 100:.1f}%)")
+    completed_mask = orders_df['order_status'] == 'completed'
+    print(f"  • Órdenes completed   : {completed_mask.sum():,} ({completed_mask.mean() * 100:.1f}%)")
+    print(f"  • Promedio items/orden: {len(order_items_df) / len(orders_df):.2f}")
 
-print(f"\nTodos los archivos guardados en ./datasets/")
-print("\nREADY FOR SQL ANALYTICS!")
+    print("\nMÉTRICAS DE NEGOCIO DISPONIBLES:")
+    completed_orders = orders_df[completed_mask]
+    print(f"  • Revenue total  : ${completed_orders['order_amount'].sum():,.2f}")
+    print(f"  • AOV (completed): ${completed_orders['order_amount'].mean():,.2f}")
+    top_country = customers_df['country'].value_counts()
+    print(f"  • Top país       : {top_country.index[0]} ({top_country.iloc[0]:,} customers)")
+
+
+# ============================================================================
+# ORQUESTADOR PRINCIPAL
+# ============================================================================
+
+def generate_data(output_dir=DEFAULT_OUTPUT_DIR,
+         num_customers=DEFAULT_NUM_CUSTOMERS,
+         num_products=DEFAULT_NUM_PRODUCTS,
+         num_orders=DEFAULT_NUM_ORDERS,
+         start_date=DEFAULT_START_DATE,
+         end_date=DEFAULT_END_DATE,
+         seed=DEFAULT_SEED):
+    """
+    Genera y guarda los 4 datasets (customers, products, orders, order_items).
+    Punto de entrada para usar desde otro script:
+
+        import generate_sales_data as gsd
+        gsd.main(output_dir="mi_carpeta", num_customers=50_000)
+    """
+    set_seed(seed)
+    print("Generando datasets realistas...")
+
+    print("\n[1/4] Generando customers...")
+    customers_df = generate_customers(num_customers, start_date, end_date)
+
+    print("[2/4] Generando products...")
+    products_df = generate_products(num_products)
+
+    print("[3/4] Generando orders...")
+    orders_df = generate_orders(customers_df, num_orders, end_date)
+
+    print("[4/4] Generando order_items...")
+    order_items_df = generate_order_items(orders_df, num_products)
+
+    save_datasets({
+        'customers': customers_df,
+        'products': products_df,
+        'orders': orders_df,
+        'order_items': order_items_df
+    }, output_dir=output_dir)
+
+    print_summary(customers_df, products_df, orders_df, order_items_df)
+    print(f"\nTodos los archivos guardados en ./{output_dir}/")
+    print("READY FOR SQL ANALYTICS!")
+
+    return {
+        'customers': customers_df,
+        'products': products_df,
+        'orders': orders_df,
+        'order_items': order_items_df
+    }
+
+def main():
+    generate_data()
+
+
+if __name__ == "__main__":
+    main()

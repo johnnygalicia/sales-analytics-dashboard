@@ -1,101 +1,501 @@
 product_id,category,price,cost
-1,Toys,20.54,11.01
-2,Home & Garden,5.0,3.13
-3,Clothing,23.81,14.22
-4,Clothing,68.77,30.56
-5,Clothing,50.91,27.1
-6,Electronics,46.64,25.45
-7,Sports,26.47,17.74
-8,Electronics,11.9,8.27
-9,Toys,50.01,20.55
-10,Home & Garden,16.99,9.97
-11,Electronics,190.05,98.64
-12,Electronics,52.27,35.34
-13,Electronics,20.81,10.3
-14,Clothing,20.31,8.53
-15,Toys,30.74,16.21
-16,Home & Garden,27.34,18.1
-17,Electronics,80.92,42.52
-18,Electronics,38.44,18.07
-19,Electronics,18.44,10.66
-20,Beauty,150.26,65.52
-21,Electronics,34.45,17.41
-22,Electronics,61.26,26.35
-23,Books,20.36,10.44
-24,Toys,44.28,29.25
-25,Toys,42.47,25.79
-26,Sports,7.3,4.67
-27,Home & Garden,166.04,70.96
-28,Sports,92.99,43.88
-29,Food,24.1,11.98
-30,Electronics,13.71,8.36
-31,Electronics,43.73,28.2
-32,Books,35.49,16.79
-33,Electronics,44.02,24.55
-34,Toys,38.6,24.41
-35,Clothing,49.65,25.57
-36,Clothing,105.41,72.51
-37,Toys,52.17,31.41
-38,Clothing,14.3,8.0
-39,Home & Garden,98.5,64.58
-40,Electronics,123.04,49.78
-41,Electronics,412.26,262.72
-42,Electronics,13.48,8.91
-43,Clothing,40.22,25.7
-44,Home & Garden,6.26,2.94
-45,Electronics,51.55,29.5
-46,Toys,21.36,11.33
-47,Electronics,154.28,107.02
-48,Electronics,17.82,12.29
-49,Electronics,8.57,4.85
-50,Clothing,22.71,10.34
-51,Food,6.82,2.96
-52,Home & Garden,60.39,40.7
-53,Home & Garden,6.35,3.42
-54,Electronics,33.88,14.43
-55,Food,6.28,3.67
-56,Clothing,25.63,11.56
-57,Sports,123.31,81.37
-58,Clothing,44.19,18.53
-59,Toys,16.6,7.88
-60,Electronics,32.3,13.49
-61,Home & Garden,33.6,16.7
-62,Toys,48.33,28.56
-63,Home & Garden,11.1,4.64
-64,Toys,53.2,32.84
-65,Books,5.0,3.0
-66,Beauty,20.01,9.8
-67,Books,22.41,10.54
-68,Electronics,54.96,23.15
-69,Beauty,33.72,21.53
-70,Clothing,10.76,4.95
-71,Books,15.06,7.2
-72,Toys,38.82,26.43
-73,Sports,31.09,18.15
-74,Beauty,20.84,12.82
-75,Clothing,22.54,13.72
-76,Electronics,57.8,23.41
-77,Electronics,21.89,11.1
-78,Toys,30.86,14.96
-79,Electronics,187.91,76.48
-80,Beauty,10.6,6.22
-81,Clothing,7.53,3.46
-82,Electronics,61.98,35.31
-83,Electronics,19.24,8.45
-84,Books,25.67,16.58
-85,Electronics,17.73,7.37
-86,Clothing,26.9,17.07
-87,Clothing,118.97,71.63
-88,Food,62.91,29.77
-89,Beauty,66.01,38.41
-90,Electronics,10.67,5.52
-91,Electronics,13.18,7.47
-92,Home & Garden,5.0,2.39
-93,Books,17.33,10.94
-94,Books,71.19,48.59
-95,Clothing,50.08,30.55
-96,Electronics,27.74,15.47
-97,Toys,32.53,21.13
-98,Sports,19.08,11.33
-99,Sports,39.01,22.63
-100,Food,61.11,41.73
+1,Clothing,22.6,14.15
+2,Books,42.17,19.8
+3,Clothing,25.9,18.03
+4,Clothing,31.87,20.23
+5,Clothing,32.61,22.19
+6,Electronics,21.77,10.14
+7,Books,63.64,30.12
+8,Books,22.6,10.3
+9,Electronics,14.81,10.35
+10,Electronics,197.1,108.33
+11,Books,31.12,15.2
+12,Toys,5.0,3.27
+13,Clothing,90.36,45.64
+14,Sports,90.13,60.81
+15,Electronics,47.74,30.82
+16,Sports,54.89,30.59
+17,Sports,186.38,93.92
+18,Toys,15.33,10.06
+19,Toys,36.84,23.74
+20,Toys,160.09,102.25
+21,Beauty,189.66,119.18
+22,Clothing,24.71,15.62
+23,Toys,165.36,96.15
+24,Toys,62.94,31.71
+25,Electronics,109.53,62.28
+26,Toys,61.3,28.64
+27,Electronics,42.28,20.47
+28,Electronics,193.93,128.39
+29,Toys,21.7,14.87
+30,Clothing,151.69,66.23
+31,Home & Garden,172.18,116.4
+32,Electronics,98.54,64.59
+33,Home & Garden,31.27,21.68
+34,Home & Garden,40.27,20.6
+35,Sports,11.94,6.27
+36,Toys,23.06,9.31
+37,Electronics,54.41,23.61
+38,Electronics,10.58,6.1
+39,Beauty,26.09,15.36
+40,Books,156.94,95.88
+41,Clothing,29.27,19.15
+42,Clothing,75.71,49.86
+43,Electronics,52.1,34.4
+44,Electronics,25.89,17.24
+45,Toys,29.25,18.37
+46,Clothing,37.84,23.01
+47,Electronics,6.42,2.64
+48,Sports,70.64,37.19
+49,Electronics,30.12,12.16
+50,Toys,72.64,42.73
+51,Home & Garden,45.18,25.42
+52,Clothing,29.08,17.52
+53,Electronics,38.79,25.02
+54,Electronics,38.89,25.55
+55,Home & Garden,107.87,44.93
+56,Toys,34.82,14.06
+57,Sports,41.7,28.63
+58,Sports,12.07,7.9
+59,Clothing,31.89,18.27
+60,Clothing,106.0,68.28
+61,Electronics,46.67,27.57
+62,Home & Garden,13.95,9.22
+63,Food,15.19,8.56
+64,Clothing,18.3,11.32
+65,Electronics,73.68,43.8
+66,Beauty,66.77,44.85
+67,Clothing,5.0,2.86
+68,Electronics,31.03,12.57
+69,Home & Garden,37.27,22.41
+70,Sports,15.34,6.7
+71,Toys,24.23,10.83
+72,Toys,96.04,39.8
+73,Electronics,45.93,21.26
+74,Toys,22.21,11.15
+75,Home & Garden,28.51,12.63
+76,Electronics,27.6,18.69
+77,Sports,41.49,23.28
+78,Home & Garden,10.55,4.25
+79,Home & Garden,19.38,9.09
+80,Sports,75.82,31.19
+81,Home & Garden,31.25,14.56
+82,Home & Garden,16.78,7.34
+83,Home & Garden,17.34,8.46
+84,Home & Garden,58.95,27.82
+85,Clothing,21.88,11.88
+86,Electronics,49.84,21.07
+87,Clothing,20.06,9.08
+88,Clothing,13.41,5.99
+89,Home & Garden,40.27,20.06
+90,Clothing,30.63,18.64
+91,Sports,57.29,39.49
+92,Food,67.17,28.17
+93,Clothing,24.87,13.04
+94,Clothing,43.78,26.73
+95,Home & Garden,24.26,15.9
+96,Beauty,54.98,24.8
+97,Electronics,39.91,17.92
+98,Toys,20.1,9.16
+99,Beauty,18.8,9.52
+100,Home & Garden,41.06,24.23
+101,Clothing,83.91,51.08
+102,Toys,68.1,47.5
+103,Clothing,15.57,7.01
+104,Books,16.94,11.41
+105,Home & Garden,19.06,9.74
+106,Clothing,20.55,11.28
+107,Electronics,7.74,4.2
+108,Food,62.3,26.29
+109,Toys,23.0,15.88
+110,Books,47.93,22.43
+111,Electronics,25.72,17.6
+112,Home & Garden,32.51,22.39
+113,Electronics,19.14,10.93
+114,Sports,32.38,22.05
+115,Electronics,16.49,7.64
+116,Clothing,32.57,17.62
+117,Clothing,106.25,73.45
+118,Books,50.22,34.55
+119,Food,41.8,21.58
+120,Clothing,11.52,5.28
+121,Home & Garden,52.13,29.65
+122,Beauty,56.35,30.07
+123,Electronics,41.04,18.88
+124,Clothing,39.31,20.32
+125,Toys,29.6,18.73
+126,Clothing,55.67,28.73
+127,Sports,101.25,51.79
+128,Toys,43.14,20.7
+129,Books,15.22,7.82
+130,Books,16.18,6.62
+131,Sports,59.2,37.94
+132,Clothing,15.32,6.35
+133,Clothing,38.89,20.94
+134,Clothing,25.12,12.52
+135,Home & Garden,14.04,9.41
+136,Sports,64.45,37.75
+137,Electronics,58.29,27.35
+138,Books,11.2,5.46
+139,Electronics,48.67,33.49
+140,Electronics,43.3,23.21
+141,Beauty,64.71,43.59
+142,Clothing,37.84,15.18
+143,Electronics,103.7,44.67
+144,Food,29.92,20.76
+145,Electronics,26.64,11.78
+146,Electronics,15.18,6.44
+147,Toys,15.69,9.32
+148,Toys,14.59,7.06
+149,Electronics,39.44,22.38
+150,Electronics,26.7,13.44
+151,Books,43.14,25.8
+152,Sports,12.59,7.59
+153,Clothing,16.7,9.56
+154,Home & Garden,16.48,10.81
+155,Electronics,187.81,84.64
+156,Clothing,29.0,17.27
+157,Clothing,31.4,18.21
+158,Electronics,31.13,13.44
+159,Clothing,114.69,63.2
+160,Clothing,9.11,4.89
+161,Home & Garden,31.57,13.04
+162,Electronics,9.04,3.92
+163,Clothing,5.0,3.25
+164,Books,18.4,10.27
+165,Electronics,46.05,18.82
+166,Electronics,17.49,10.29
+167,Books,45.45,26.75
+168,Sports,36.06,23.13
+169,Beauty,29.63,19.72
+170,Home & Garden,91.1,43.54
+171,Home & Garden,20.56,9.64
+172,Electronics,44.9,18.38
+173,Toys,7.83,3.66
+174,Sports,35.84,22.47
+175,Electronics,26.96,18.55
+176,Food,12.86,5.2
+177,Electronics,45.55,27.23
+178,Books,18.34,11.12
+179,Home & Garden,132.39,56.69
+180,Electronics,5.0,2.62
+181,Sports,40.39,25.67
+182,Toys,34.27,14.85
+183,Clothing,26.45,10.63
+184,Sports,21.68,14.62
+185,Sports,34.98,15.44
+186,Toys,77.46,45.15
+187,Home & Garden,8.69,4.72
+188,Toys,17.38,7.4
+189,Toys,14.29,5.83
+190,Clothing,13.77,8.55
+191,Electronics,43.56,27.71
+192,Toys,53.06,35.86
+193,Clothing,77.64,41.26
+194,Books,53.74,37.4
+195,Electronics,57.34,33.05
+196,Home & Garden,10.7,7.26
+197,Home & Garden,108.51,62.77
+198,Electronics,28.0,19.26
+199,Sports,75.67,34.01
+200,Electronics,11.01,7.02
+201,Electronics,27.3,16.42
+202,Toys,70.42,30.91
+203,Home & Garden,33.86,16.12
+204,Home & Garden,18.12,11.49
+205,Electronics,94.43,64.06
+206,Books,12.97,6.3
+207,Books,32.58,18.99
+208,Clothing,55.26,25.98
+209,Electronics,177.07,100.3
+210,Food,22.95,13.68
+211,Electronics,26.54,14.99
+212,Sports,23.2,11.03
+213,Home & Garden,40.08,17.21
+214,Sports,53.0,36.31
+215,Home & Garden,79.41,43.1
+216,Sports,60.63,41.85
+217,Sports,22.24,12.45
+218,Electronics,63.48,27.58
+219,Food,35.63,21.08
+220,Electronics,60.11,25.26
+221,Electronics,62.92,32.14
+222,Electronics,122.01,51.21
+223,Electronics,24.94,11.79
+224,Books,21.4,14.32
+225,Toys,47.36,29.87
+226,Electronics,85.29,49.62
+227,Clothing,34.69,22.51
+228,Home & Garden,89.85,49.56
+229,Clothing,57.52,32.13
+230,Books,28.19,11.65
+231,Sports,51.97,29.62
+232,Sports,23.39,10.86
+233,Sports,40.08,16.73
+234,Home & Garden,14.03,6.13
+235,Clothing,31.36,19.99
+236,Beauty,73.68,40.61
+237,Sports,61.17,36.44
+238,Home & Garden,54.42,31.56
+239,Toys,41.68,24.66
+240,Toys,37.63,17.01
+241,Beauty,12.02,6.78
+242,Electronics,28.08,15.25
+243,Clothing,38.32,15.53
+244,Home & Garden,13.47,9.19
+245,Electronics,8.15,4.51
+246,Electronics,81.7,38.22
+247,Toys,34.49,22.58
+248,Books,39.17,20.23
+249,Electronics,51.65,32.44
+250,Clothing,15.09,6.64
+251,Sports,23.98,14.43
+252,Electronics,110.31,66.32
+253,Electronics,22.4,11.66
+254,Beauty,26.77,17.27
+255,Home & Garden,19.38,11.91
+256,Books,18.31,10.53
+257,Electronics,80.19,47.62
+258,Clothing,5.0,2.71
+259,Clothing,22.97,11.95
+260,Sports,39.66,21.02
+261,Clothing,128.69,64.83
+262,Electronics,13.35,8.11
+263,Sports,11.65,7.71
+264,Books,16.64,7.85
+265,Books,58.05,25.82
+266,Clothing,36.61,22.8
+267,Sports,10.44,6.03
+268,Clothing,35.86,19.74
+269,Books,114.57,61.87
+270,Electronics,40.92,20.55
+271,Home & Garden,37.77,25.97
+272,Electronics,39.64,19.17
+273,Electronics,46.14,31.44
+274,Sports,12.02,6.72
+275,Clothing,27.51,12.43
+276,Clothing,28.68,16.19
+277,Clothing,22.49,14.74
+278,Electronics,57.33,23.19
+279,Food,19.94,8.64
+280,Toys,24.83,11.64
+281,Electronics,12.08,6.97
+282,Sports,44.82,28.9
+283,Books,70.35,29.38
+284,Clothing,24.81,13.4
+285,Clothing,63.18,28.07
+286,Food,29.44,17.59
+287,Electronics,5.0,3.0
+288,Beauty,31.78,12.85
+289,Home & Garden,28.78,15.64
+290,Electronics,35.96,23.65
+291,Books,40.55,25.71
+292,Sports,19.16,10.64
+293,Electronics,107.45,73.85
+294,Home & Garden,31.41,17.63
+295,Toys,28.23,16.21
+296,Books,60.08,28.01
+297,Electronics,33.61,19.95
+298,Food,257.93,104.52
+299,Electronics,28.0,18.08
+300,Clothing,43.88,22.94
+301,Clothing,18.19,12.24
+302,Electronics,66.45,31.88
+303,Books,42.39,17.02
+304,Home & Garden,25.25,11.47
+305,Books,16.48,8.79
+306,Home & Garden,11.62,6.44
+307,Home & Garden,46.29,20.81
+308,Clothing,10.92,4.58
+309,Beauty,94.33,38.04
+310,Electronics,12.06,7.01
+311,Electronics,28.71,11.56
+312,Electronics,16.36,10.69
+313,Electronics,33.99,21.21
+314,Electronics,33.83,22.77
+315,Clothing,47.27,29.23
+316,Clothing,9.77,4.59
+317,Sports,17.98,7.98
+318,Books,71.98,33.57
+319,Books,56.08,28.64
+320,Electronics,5.0,2.73
+321,Toys,44.78,21.83
+322,Books,14.5,8.45
+323,Electronics,20.63,9.23
+324,Toys,27.61,13.72
+325,Electronics,115.11,56.48
+326,Toys,14.38,7.75
+327,Home & Garden,10.77,4.68
+328,Home & Garden,47.48,29.64
+329,Electronics,32.38,18.96
+330,Books,86.97,40.59
+331,Home & Garden,24.97,13.79
+332,Books,87.24,37.8
+333,Home & Garden,33.55,20.0
+334,Toys,50.57,29.79
+335,Books,121.41,52.62
+336,Electronics,28.97,16.24
+337,Clothing,76.38,41.64
+338,Books,20.27,12.17
+339,Sports,39.73,24.51
+340,Clothing,10.43,5.25
+341,Home & Garden,22.12,14.69
+342,Home & Garden,14.2,6.2
+343,Electronics,87.94,41.0
+344,Electronics,133.09,85.55
+345,Electronics,24.93,12.26
+346,Clothing,17.84,9.26
+347,Electronics,11.57,7.46
+348,Sports,40.92,25.29
+349,Clothing,20.45,11.81
+350,Books,21.35,10.47
+351,Beauty,121.96,62.0
+352,Sports,26.12,14.12
+353,Food,52.95,24.86
+354,Food,34.55,16.33
+355,Clothing,11.2,5.76
+356,Electronics,7.57,3.51
+357,Electronics,48.91,29.33
+358,Electronics,129.45,56.39
+359,Electronics,42.61,21.96
+360,Beauty,54.56,24.73
+361,Books,16.06,8.61
+362,Food,74.58,47.32
+363,Electronics,73.85,39.68
+364,Clothing,18.97,11.17
+365,Electronics,51.23,25.14
+366,Beauty,8.06,4.49
+367,Clothing,59.09,26.54
+368,Beauty,20.95,10.4
+369,Home & Garden,12.41,6.14
+370,Clothing,45.7,29.01
+371,Clothing,8.03,3.25
+372,Sports,43.55,19.49
+373,Home & Garden,13.39,6.2
+374,Sports,11.28,6.78
+375,Electronics,34.74,18.74
+376,Home & Garden,28.85,19.01
+377,Electronics,106.21,57.19
+378,Clothing,11.85,7.78
+379,Home & Garden,99.49,53.14
+380,Home & Garden,13.33,6.74
+381,Electronics,69.1,40.28
+382,Electronics,80.23,44.16
+383,Books,42.83,18.73
+384,Food,17.59,11.74
+385,Clothing,9.79,4.53
+386,Home & Garden,6.95,4.51
+387,Home & Garden,145.74,100.41
+388,Home & Garden,26.12,16.83
+389,Books,13.68,6.44
+390,Electronics,13.27,7.68
+391,Electronics,37.87,16.6
+392,Electronics,24.15,13.1
+393,Books,7.13,4.94
+394,Electronics,66.13,32.07
+395,Sports,43.29,28.87
+396,Sports,144.3,66.84
+397,Books,82.49,53.58
+398,Clothing,5.0,2.98
+399,Sports,102.88,48.52
+400,Clothing,87.01,36.0
+401,Electronics,18.37,10.81
+402,Sports,23.43,10.57
+403,Books,46.03,29.59
+404,Clothing,14.71,6.74
+405,Books,27.27,13.71
+406,Clothing,73.7,47.33
+407,Electronics,50.11,30.53
+408,Clothing,19.43,12.83
+409,Clothing,75.05,43.91
+410,Beauty,42.2,26.96
+411,Electronics,41.06,20.81
+412,Home & Garden,21.93,8.81
+413,Toys,32.94,22.94
+414,Electronics,17.83,9.59
+415,Clothing,7.01,3.7
+416,Clothing,26.47,11.27
+417,Clothing,30.03,16.46
+418,Clothing,36.96,19.84
+419,Food,87.33,48.78
+420,Home & Garden,19.65,12.17
+421,Sports,24.68,16.86
+422,Clothing,61.13,35.29
+423,Electronics,18.14,12.41
+424,Electronics,37.45,20.03
+425,Electronics,23.89,14.52
+426,Sports,27.25,14.71
+427,Beauty,60.73,40.07
+428,Electronics,24.56,10.32
+429,Books,62.34,26.91
+430,Home & Garden,6.95,4.47
+431,Books,10.55,6.3
+432,Electronics,5.18,2.67
+433,Home & Garden,13.03,8.75
+434,Clothing,146.27,86.83
+435,Electronics,32.65,20.4
+436,Clothing,18.6,7.91
+437,Toys,61.94,27.52
+438,Electronics,69.35,36.48
+439,Books,12.47,6.78
+440,Sports,244.34,102.81
+441,Electronics,41.31,17.36
+442,Electronics,45.69,18.7
+443,Home & Garden,49.29,32.65
+444,Food,49.21,32.08
+445,Clothing,20.14,10.01
+446,Clothing,179.47,96.48
+447,Electronics,26.36,18.31
+448,Home & Garden,71.24,48.54
+449,Sports,22.65,9.82
+450,Books,19.65,8.63
+451,Electronics,151.64,89.89
+452,Electronics,30.37,13.14
+453,Clothing,32.22,16.82
+454,Electronics,41.55,19.04
+455,Electronics,265.45,151.77
+456,Clothing,187.73,125.03
+457,Clothing,92.48,52.7
+458,Beauty,324.7,182.74
+459,Books,15.55,8.32
+460,Beauty,55.96,37.4
+461,Clothing,35.19,14.17
+462,Electronics,8.04,5.04
+463,Home & Garden,47.97,30.72
+464,Sports,22.36,12.12
+465,Electronics,112.93,60.85
+466,Electronics,24.14,13.71
+467,Electronics,23.07,10.81
+468,Home & Garden,112.89,61.53
+469,Sports,31.43,16.25
+470,Sports,83.96,40.54
+471,Toys,46.5,32.2
+472,Sports,47.0,24.86
+473,Beauty,27.24,11.84
+474,Toys,49.49,34.38
+475,Books,29.81,17.24
+476,Home & Garden,17.41,7.35
+477,Clothing,30.47,18.1
+478,Electronics,92.78,52.18
+479,Electronics,50.85,20.62
+480,Toys,61.24,39.2
+481,Electronics,33.15,22.56
+482,Electronics,7.03,3.11
+483,Home & Garden,12.46,5.48
+484,Electronics,26.28,14.67
+485,Beauty,13.36,7.29
+486,Sports,21.77,9.78
+487,Electronics,21.15,10.12
+488,Books,21.66,13.44
+489,Clothing,104.56,72.66
+490,Electronics,31.74,17.65
+491,Sports,69.95,30.94
+492,Food,37.76,16.28
+493,Sports,102.78,42.46
+494,Clothing,74.95,32.69
+495,Books,20.63,10.85
+496,Clothing,159.06,90.13
+497,Books,23.02,10.76
+498,Home & Garden,38.86,18.58
+499,Books,44.77,24.11
+500,Toys,48.94,32.98
